@@ -98,3 +98,14 @@ else:
     st.map(df)
     for _, row in df.iterrows():
         st.text(f"{row['date']} | {row['author']} | {row['content']} ({row['lat']}, {row['lon']})")
+sheet_url = "https://docs.google.com/spreadsheets/d/1NE0CYC_FgkSN6ankt9-x3uRzBSXWC52kHYc9qIZIp5Q/edit"
+st.markdown(f"[👉 Google Sheet 바로가기]({sheet_url})")
+st.subheader("작성자별 민원 조회")
+search_author = st.text_input("작성자 이름을 입력하세요:")
+if st.button("조회"):
+    filtered = df[df["author"] == search_author]
+    st.write(filtered)
+st.subheader("날짜별 민원 수")
+if not df.empty:
+    count_by_date = df["date"].value_counts().sort_index()
+    st.bar_chart(count_by_date)
