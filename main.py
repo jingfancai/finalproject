@@ -87,3 +87,14 @@ st.subheader("모든 민원 보기")
 sheet1 = get_or_create_sheet()
 data = sheet1.get_all_records()
 df = pd.DataFrame(data)
+
+if df.empty:
+    st.warning("Google Sheet에서 데이터를 불러오지 못했습니다.")
+else:
+    df = df.rename(columns={"위도": "lat", "경도": "lon" ,"날짜": "date","작성자": "author","내용": "content"})
+    df["lat"] = pd.to_numeric(df["lat"], errors="coerce")
+    df["lon"] = pd.to_numeric(df["lon"], errors="coerce")
+    df = df.dropna(subset=["lat", "lon"])
+    st.map(df)
+    for _, row in df.iterrows():
+        st.text(f"{row['date']} | {row['author']} | {row['content']} ({row['lat']}, {row['lon']})")
