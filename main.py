@@ -4,7 +4,7 @@ import pandas as pd
 import pydeck as pdk
 from datetime import date
 import gspread
-from google_auth_oauthlib.flow import InstalledAppFlow
+from oauth2client.service_account import ServiceAccountCredentials
 
 class Complaint:
     def __init__(self, author, content, latitude, longitude, complaint_date=None):
@@ -22,10 +22,8 @@ st.title("동네 민원/불편사항 신고 플랫폼")
 
 @st.cache_resource
 def get_gsheet_client():
-    flow = InstalledAppFlow.from_client_secrets_file(
-    'credentials1.json',
-    scopes=['https://www.googleapis.com/auth/spreadsheets'])
-    creds = flow.run_local_server(port=8080)
+    scopes=['https://www.googleapis.com/auth/spreadsheets','https://www.googleapis.com/auth/drive']
+    creds = ServiceAccountCredentials.from_json_keyfile_name('credentials.json', scope)
     client = gspread.authorize(creds)
     return client
 
