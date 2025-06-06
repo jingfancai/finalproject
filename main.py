@@ -54,3 +54,13 @@ layer = pdk.Layer(
     get_color='[255, 0, 0, 160]',
     get_radius=100,
 )
+st.pydeck_chart(pdk.Deck(
+    map_style='mapbox://styles/mapbox/streets-v11',
+    initial_view_state=pdk.ViewState(
+        latitude=lat,
+        longitude=lon,
+        zoom=12,
+        pitch=50,
+    ),
+    layers=[layer],
+))
