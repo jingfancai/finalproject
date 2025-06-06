@@ -82,3 +82,8 @@ with st.form("complaint_form"):
         if "complaints" not in st.session_state:
             st.session_state["complaints"] = []
         st.session_state["complaints"].append(complaint)
+
+st.subheader("모든 민원 보기")
+sheet1 = get_or_create_sheet()
+data = sheet1.get_all_records()
+df = pd.DataFrame(data)
