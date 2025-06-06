@@ -37,3 +37,8 @@ def get_or_create_sheet():
     elif sheet.row_values(1) != ["작성자", "내용", "위도", "경도", "날짜"]:
         sheet.insert_row(["작성자", "내용", "위도", "경도", "날짜"], 1)
     return sheet
+    
+st.subheader("민원 등록")
+
+default_lat = 37.5665
+default_lon = 126.9780
