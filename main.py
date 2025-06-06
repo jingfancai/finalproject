@@ -42,3 +42,7 @@ st.subheader("민원 등록")
 
 default_lat = 37.5665
 default_lon = 126.9780
+
+st.markdown("**위치를 지도에서 클릭하는 대신, 위도와 경도를 직접 입력하세요.**")
+lat = st.number_input("위도 (Latitude)", value=default_lat, format="%.6f")
+lon = st.number_input("경도 (Longitude)", value=default_lon, format="%.6f")
