@@ -64,3 +64,21 @@ st.pydeck_chart(pdk.Deck(
     ),
     layers=[layer],
 ))
+
+with st.form("complaint_form"):
+    author = st.text_input("작성자")
+    content = st.text_area("불편 사항 내용")
+    complaint_date = st.date_input("작성일", value=date.today())
+    submitted = st.form_submit_button("민원 등록")
+
+    if submitted:
+        complaint = Complaint(author, content, lat, lon, complaint_date)
+        
+        st.success("민원이 등록되었습니다!")
+        st.write("민원 내용:")
+        st.code(str(complaint), language="markdown")
+        get_or_create_sheet().append_row([author, content, lat, lon, str(complaint_date)])
+
+        if "complaints" not in st.session_state:
+            st.session_state["complaints"] = []
+        st.session_state["complaints"].append(complaint)
