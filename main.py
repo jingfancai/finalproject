@@ -25,7 +25,7 @@ st.title("동네 민원/불편사항 신고 플랫폼")
 @st.cache_resource
 def get_gsheet_client():
     scopes=['https://www.googleapis.com/auth/spreadsheets','https://www.googleapis.com/auth/drive']
-    creds = ServiceAccountCredentials.from_json_keyfile_name('credentials.json', scope)
+    creds = ServiceAccountCredentials.from_json_keyfile_name('credentials.json', scopes)
     client = gspread.authorize(creds)
     return client
 
