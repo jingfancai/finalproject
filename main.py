@@ -1,7 +1,6 @@
 from datetime import date
 import streamlit as st
 import pandas as pd
-import pydeck as pdk
 from datetime import date
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
@@ -41,7 +40,7 @@ def get_or_create_sheet():
 st.subheader("민원 등록")
 
 default_location = [37.5665, 126.9780]
-st.markdown("**위치를 지도에서 클릭하고 민원내용을 입력하세요.**")
+st.info("**위치를 지도에서 클릭하고 민원내용을 입력하세요.**")
 m = folium.Map(location=default_location, zoom_start=12)
 map_data = st_folium(m, height=600, width=1000)
 lat, lon = None, None
