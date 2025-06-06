@@ -5,6 +5,8 @@ import pydeck as pdk
 from datetime import date
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
+import folium
+from streamlit_folium import st_folium
 
 class Complaint:
     def __init__(self, author, content, latitude, longitude, complaint_date=None):
@@ -38,52 +40,40 @@ def get_or_create_sheet():
     
 st.subheader("민원 등록")
 
-default_lat = 37.5665
-default_lon = 126.9780
+default_location = [37.5665, 126.9780]
+st.markdown("**위치를 지도에서 클릭하고 민원내용을 입력하세요.**")
+m = folium.Map(location=default_location, zoom_start=12)
+map_data = st_folium(m, height=600, width=1000)
+lat, lon = None, None
 
-st.markdown("**위치를 지도에서 클릭하는 대신, 위도와 경도를 직접 입력하세요.**")
-lat = st.number_input("위도 (Latitude)", value=default_lat, format="%.6f")
-lon = st.number_input("경도 (Longitude)", value=default_lon, format="%.6f")
+if map_data and map_data.get("last_clicked"):
+    lat = map_data["last_clicked"]["lat"]
+    lon = map_data["last_clicked"]["lng"]
+    st.success(f"선택한 위치：위도 {lat:.6f}, 경도 {lon:.6f}")
 
-layer = pdk.Layer(
-    'ScatterplotLayer',
-    data=pd.DataFrame([{"lat": lat, "lon": lon}]),
-    get_position='[lon, lat]',
-    get_color='[255, 0, 0, 160]',
-    get_radius=100,
-)
-st.pydeck_chart(pdk.Deck(
-    map_style='mapbox://styles/mapbox/streets-v11',
-    initial_view_state=pdk.ViewState(
-        latitude=lat,
-        longitude=lon,
-        zoom=12,
-        pitch=50,
-    ),
-    layers=[layer],
-))
+if lat and lon:
+    with st.form("complaint_form"):
+        author = st.text_input("작성자")
+        content = st.text_area("불편 사항 내용")
+        complaint_date = st.date_input("작성일", value=date.today())
+        submitted = st.form_submit_button("민원 등록")
 
-with st.form("complaint_form"):
-    author = st.text_input("작성자")
-    content = st.text_area("불편 사항 내용")
-    complaint_date = st.date_input("작성일", value=date.today())
-    submitted = st.form_submit_button("민원 등록")
-
-    if submitted:
-        complaint = Complaint(author, content, lat, lon, complaint_date)
-        
-        st.success("민원이 등록되었습니다!")
-        st.write("민원 내용:")
-        st.code(str(complaint), language="markdown")
-        get_or_create_sheet().append_row([author, content, lat, lon, str(complaint_date)])
-
-        if "complaints" not in st.session_state:
-            st.session_state["complaints"] = []
-        st.session_state["complaints"].append(complaint)
+        if submitted:
+            complaint = Complaint(author, content, lat, lon, complaint_date)
+            st.success("민원이 등록되었습니다!")
+            st.write("민원 내용:")
+            st.code(str(complaint), language="markdown")
+            get_or_create_sheet().append_row([author, content, lat, lon, str(complaint_date)])
+            if "complaints" not in st.session_state:
+                st.session_state["complaints"] = []
+            st.session_state["complaints"].append(complaint)
 
 st.subheader("모든 민원 보기")
-sheet1 = get_or_create_sheet()
-data = sheet1.get_all_records()
+@st.cache_data(ttl=60) 
+def get_sheet_data():
+    sheet = get_or_create_sheet()
+    return sheet.get_all_records()
+data = get_sheet_data()
 df = pd.DataFrame(data)
 
 if df.empty:
